@@ -17,6 +17,14 @@ export const CategoryProvider = ({ children }) => {
             setLoading(false);
         }
     }
+    const addCategory = async (category) => {
+        try {
+            const response = await api.post('/admin/categories', category);
+            setCategories((prevCategories) => [...prevCategories, response.data]);
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout de la catégorie', error);
+        }
+    }
     const deleteCategory = async (categoryId) => {
         try {
             await api.delete(`/admin/categories/${categoryId}`);
@@ -31,7 +39,7 @@ export const CategoryProvider = ({ children }) => {
     
     }, []);
     return (
-        <CategoryContext.Provider value={{ categories, setCategories, loading, fetchCategories, deleteCategory }}>
+        <CategoryContext.Provider value={{ categories, setCategories, loading, fetchCategories, deleteCategory,addCategory }}>
             {children}
         </CategoryContext.Provider>
     );

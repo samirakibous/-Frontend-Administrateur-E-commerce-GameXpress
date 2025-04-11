@@ -10,7 +10,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
 
 function Categories() {
-    const { categories, loading, setCategories, deleteCategory } = useCategory();
+    const { categories, loading, setCategories, deleteCategory,addCategory  } = useCategory();
     const [editingCategory, setEditingCategory] = useState(null);
     const [newCategory, setNewCategory] = useState({
         id: '',
@@ -51,16 +51,24 @@ function Categories() {
         setNewCategory({ ...newCategory, [e.target.name]: e.target.value });
     };
 
-    const handleAddCategory = () => {
+    const handleAddCategory = async () => {
         if (newCategory.name.trim() === '') return;
-        const newCat = {
-            id: Date.now(), // temporaire si pas géré par backend
+    
+        const slug = newCategory.name
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '');
+    
+        const categoryToSend = {
             name: newCategory.name,
+            slug: slug,
         };
-        setCategories([...categories, newCat]);
+    
+        await addCategory(categoryToSend);
         setNewCategory({ id: '', name: '' });
         setShowAddForm(false);
     };
+    
 
     const filteredCategories = categories.filter(category =>
         category.id.toString().includes(searchTerm.toLowerCase()) ||
