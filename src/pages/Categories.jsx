@@ -10,7 +10,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SearchIcon from '@mui/icons-material/Search';
 
 function Categories() {
-    const { categories, loading, setCategories, deleteCategory,addCategory  } = useCategory();
+    const { categories, loading, setCategories, deleteCategory, addCategory, updateCategory } = useCategory();
     const [editingCategory, setEditingCategory] = useState(null);
     const [newCategory, setNewCategory] = useState({
         id: '',
@@ -20,7 +20,7 @@ function Categories() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        // fetchCategories(); // supposé être dans le context
+        // fetchCategories();
     }, []);
 
     const handleEdit = (category) => {
@@ -31,10 +31,23 @@ function Categories() {
         setEditingCategory({ ...editingCategory, [e.target.name]: e.target.value });
     };
 
-    const handleSaveEdit = () => {
-        setCategories(categories.map(category => category.id === editingCategory.id ? editingCategory : category));
-        setEditingCategory(null);
+    const handleSaveEdit = async () => {
+        if (!editingCategory.name.trim()) return;
+
+        try {
+            await updateCategory(editingCategory.id, {
+                name: editingCategory.name,
+                slug: editingCategory.name
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+            });
+            setEditingCategory(null);
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour :", error);
+        }
     };
+
 
     const handleCancelEdit = () => {
         setEditingCategory(null);
@@ -53,22 +66,22 @@ function Categories() {
 
     const handleAddCategory = async () => {
         if (newCategory.name.trim() === '') return;
-    
+
         const slug = newCategory.name
             .toLowerCase()
             .replace(/\s+/g, '-')
             .replace(/[^\w\-]+/g, '');
-    
+
         const categoryToSend = {
             name: newCategory.name,
             slug: slug,
         };
-    
+
         await addCategory(categoryToSend);
         setNewCategory({ id: '', name: '' });
         setShowAddForm(false);
     };
-    
+
 
     const filteredCategories = categories.filter(category =>
         category.id.toString().includes(searchTerm.toLowerCase()) ||
