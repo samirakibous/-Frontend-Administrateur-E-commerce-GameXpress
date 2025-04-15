@@ -80,7 +80,7 @@ export default function UserManagementTable() {
 
     const handleAddUser = async () => {
         try {
-            const response = await api.post('admin/users', newUser); // Remplacez avec l'URL de votre API
+            const response = await api.post('admin/users', newUser);
             setUsers([...users, response.data]);
             setNewUser({
                 nom: '',
@@ -90,6 +90,7 @@ export default function UserManagementTable() {
                 password_confirmation: ''
             });
             setShowAddForm(false);
+            fetchUsers();
         } catch (error) {
             console.error('Erreur lors de l\'ajout de l\'utilisateur', error);
         }
@@ -104,10 +105,11 @@ export default function UserManagementTable() {
     };
 
     const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || "")
+        || (user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || "")
+        || (user.role?.toLowerCase().includes(searchTerm.toLowerCase()) || "")
+      );
+      
 
     if (loading) {
         return <div>Chargement...</div>;
