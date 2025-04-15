@@ -53,9 +53,15 @@ export default function UserManagementTable() {
         setEditingUser({ ...user });
     };
 
-    const handleSaveEdit = () => {
-        setUsers(users.map(user => user.id === editingUser.id ? editingUser : user));
-        setEditingUser(null);
+    const handleSaveEdit = async () => {
+        try {
+            const response = await api.put(`admin/users/${editingUser.id}`, editingUser);
+            setUsers(users.map(user => user.id === editingUser.id ? editingUser : user));
+            setEditingUser(null);
+        }
+        catch (error) {
+            console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
+        }
     };
 
     const handleCancelEdit = () => {
@@ -75,7 +81,6 @@ export default function UserManagementTable() {
             setUsers([...users, response.data]);
             setNewUser({
                 name: '',
-                prenom: '',
                 email: '',
                 role: '',
                 Password: '',
@@ -243,7 +248,7 @@ export default function UserManagementTable() {
                                                     <td className="py-3 px-4">
                                                         <input
                                                             type="text"
-                                                            name="nom"
+                                                            name="name"
                                                             className="w-full p-1 border border-gray-300 rounded"
                                                             value={editingUser.name}
                                                             onChange={handleChangeEditingUser}
@@ -260,15 +265,14 @@ export default function UserManagementTable() {
                                                         />
                                                     </td>
                                                     <td className="py-3 px-4">
-                                                        <select
-                                                            name="role"
-                                                            className="w-full p-1 border border-gray-300 rounded"
-                                                            value={editingUser.role}
-                                                            onChange={handleChangeEditingUser}
-                                                        >
-                                                            <option value="Utilisateur">Utilisateur</option>
-                                                            <option value="Éditeur">Éditeur</option>
-                                                            <option value="Admin">Admin</option>
+
+                                                        <select className="w-full p-1 border border-gray-300 rounded"
+                                                         value={editingUser.role}
+                                                         onChange={handleChangeEditingUser}>
+                                                            {roles && roles.map((role) => (
+                                                                <option key={role.id} value={role.name}>{role.name}</option>
+
+                                                            ))}
                                                         </select>
                                                     </td>
                                                     <td className="py-3 px-4">
