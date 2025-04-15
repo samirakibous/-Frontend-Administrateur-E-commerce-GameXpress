@@ -11,20 +11,40 @@ import axios from 'axios';
 import Sidebar from '../components/sidebar';
 import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
+import { Password } from '@mui/icons-material';
 
 export default function UserManagementTable() {
-    const { users, setUsers, loading, fetchUsers, deleteUser } = useUserContext();
+    const { users, setUsers, loading, fetchUsers, deleteUser, getRoles, roles } = useUserContext();
     const [editingUser, setEditingUser] = useState(null);
+    // const [roles, setRoles] = useState([]);
     const [newUser, setNewUser] = useState({
-        nom: '',
+        name: '',
         prenom: '',
         email: '',
-        role: 'Utilisateur',
+        role: '',
+        password: '',
+        password_confirmation: ''
     });
     useEffect(() => {
-        fetchUsers(); // Fetch users when the component mounts
-
+        fetchUsers();
+        // fetchRoles();
+        const fetchRoles = async () => {
+            try {
+                const response = getRoles();
+            } catch (error) {
+                console.error('Erreur lors de la récupération des rôles', error);
+            }
+        }
+        fetchRoles();
+        getRoles();
+        // console.log(roles);
     }, []);
+    // useEffect(() => {
+    //     // console.log(roles);
+    //     console.log("roles test : ",roles);
+
+    // }, [roles]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -51,9 +71,16 @@ export default function UserManagementTable() {
 
     const handleAddUser = async () => {
         try {
-            const response = await axios.post('/api/users', newUser); // Remplacez avec l'URL de votre API
+            const response = await api.post('admin/users', newUser); // Remplacez avec l'URL de votre API
             setUsers([...users, response.data]);
-            setNewUser({ nom: '', prenom: '', email: '', role: 'Utilisateur' });
+            setNewUser({
+                name: '',
+                prenom: '',
+                email: '',
+                role: '',
+                Password: '',
+                password_confirmation: ''
+            });
             setShowAddForm(false);
         } catch (error) {
             console.error('Erreur lors de l\'ajout de l\'utilisateur', error);
@@ -128,7 +155,7 @@ export default function UserManagementTable() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
                                     <input
                                         type="text"
-                                        name="nom"
+                                        name="name"
                                         className="w-full p-2 border border-gray-300 rounded-md"
                                         value={newUser.name}
                                         onChange={handleChangeNewUser}
@@ -146,16 +173,35 @@ export default function UserManagementTable() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
-                                    <select
-                                        name="role"
-                                        className="w-full p-2 border border-gray-300 rounded-md"
-                                        value={newUser.role}
-                                        onChange={handleChangeNewUser}
-                                    >
-                                        <option value="Utilisateur">Utilisateur</option>
-                                        <option value="Éditeur">Éditeur</option>
-                                        <option value="Admin">Admin</option>
+
+                                    {/* <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label> */}
+
+                                    <select className="w-full p-1 border border-gray-300 rounded">
+                                        {roles && roles.map((role) => (
+                                            <option key={role.id} value={role.name}>{role.name}</option>
+
+                                        ))}
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        value={newUser.password}
+                                        onChange={handleChangeNewUser}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password Confirmation</label>
+                                    <input
+                                        type="password"
+                                        name="password_confirmation"
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        value={newUser.password_confirmation}
+                                        onChange={handleChangeNewUser}
+                                    />
                                 </div>
                             </div>
                             <div className="flex justify-end gap-2">
@@ -280,8 +326,9 @@ export default function UserManagementTable() {
                             </tbody>
                         </table>
                     </div>
+
                 </div>
-                </Box>
+            </Box>
         </Box>
     );
 }
