@@ -83,10 +83,10 @@ export default function UserManagementTable() {
             const response = await api.post('admin/users', newUser); // Remplacez avec l'URL de votre API
             setUsers([...users, response.data]);
             setNewUser({
-                name: '',
+                nom: '',
                 email: '',
                 role: '',
-                Password: '',
+                password: '',
                 password_confirmation: ''
             });
             setShowAddForm(false);
