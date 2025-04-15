@@ -56,8 +56,11 @@ export default function UserManagementTable() {
     const handleSaveEdit = async () => {
         try {
             const response = await api.put(`admin/users/${editingUser.id}`, editingUser);
+            console.log(response.data);
+            // Mettre à jour l'utilisateur dans l'état local
             setUsers(users.map(user => user.id === editingUser.id ? editingUser : user));
             setEditingUser(null);
+            fetchUsers();
         }
         catch (error) {
             console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
@@ -267,6 +270,7 @@ export default function UserManagementTable() {
                                                     <td className="py-3 px-4">
 
                                                         <select className="w-full p-1 border border-gray-300 rounded"
+                                                            name="role"
                                                          value={editingUser.role}
                                                          onChange={handleChangeEditingUser}>
                                                             {roles && roles.map((role) => (

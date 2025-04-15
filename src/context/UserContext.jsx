@@ -57,8 +57,11 @@ export const UserProvider = ({ children }) => {
     };
     const updateUser = async (userId, updatedUser) => {
         try {
+            console.log('Données envoyées:', updatedUser);
             const response = await api.put(`admin/users/${userId}`, updatedUser);
+            console.log(response.data);
             setUsers((prevUsers) => prevUsers.map(user => user.id === userId ? response.data : user));
+            console.log('Utilisateur mis à jour avec succès', response.data);
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
         }
